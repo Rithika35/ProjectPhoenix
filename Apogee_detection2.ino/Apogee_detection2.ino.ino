@@ -1,4 +1,3 @@
-
 #include <SD.h>
 #include <Wire.h>
 #include "SparkFunMPL3115A2.h"
@@ -56,30 +55,19 @@ void loop() {
   int TenthSec = (time/100000) % 10;
   int OneSec = (time/ 1000000) % 10;
   int TenSec = (time/ 10000000)%6;
-  Kelvin = (temperature - 32) * 5/9 + 273.15;
-  Altitude_AGL = (Kelvin/L_b)*((pow((P/pressure),(-R*L_b)/(g_0*M)))-1)- h_0;
-
  // Read sensor every 10 milliseconds
-  if (time - lastReadingTime == readingInterval) {
+  if (time - lastReadingTime >= readingInterval) {
     lastReadingTime = time;
    //once rocket reaches lock out period
- 
-  Serial.print("T+");Serial.print(time/60000000);Serial.print(":");Serial.print(TenSec);Serial.print(OneSec);Serial.print(":");Serial.print(TenthSec);Serial.print(HundrethSec);Serial.print(MilliSec);Serial.print(HundredMicro);Serial.print(TenMicro);Serial.print(Micro);
-  pressure = myPressure.readPressure();
-  Serial.print(" Pressure(Pa):");
-  Serial.print(pressure, 2);
-   // open the file. note that only one file can be open at a time,
-  // so you have to close this one before opening another.  
-  // float temperature = myPressure.readTemp();
-  // Serial.print(" Temp(c):");
-  // Serial.print(temperature, 2);
-  temperature = myPressure.readTempF();
-  Serial.print(" Temp(f):");
-  Serial.print(temperature, 2);
-  Serial.print(" Altitude(m):");
-  Serial.print(Altitude_AGL, 2);
-  Serial.println(" LOCKOUT PERIOD");
   while(time > SuperSonicCount && apogee==0  ){
+    time = micros();
+    float SuperSonicCount = (SuperSonicSec/60.0 +SuperSonicMin)*60000000.0;
+    int MilliSec = (time/1000) % 10;
+    int HundrethSec = (time/10000) % 10;
+    int TenthSec = (time/100000) % 10;
+    int OneSec = (time/ 1000000) % 10;
+    int TenSec = (time/ 10000000)%6;
+    PORTB |= (1 << led_pin);
     if (time - lastReadingTime >= readingInterval) {
     lastReadingTime = time;
     pinMode(ledPin, OUTPUT);
@@ -94,6 +82,7 @@ void loop() {
     Altitude_AGL = (Kelvin/L_b)*((pow((P/pressure),(-R*L_b)/(g_0*M)))-1)- h_0;
     Serial.print(" Altitude(m):");
     Serial.print(Altitude_AGL, 2);
+    Serial.println(" LOCKOUT PERIOD");
     for (int i = 0; i < NUM_READINGS; i++) {
     pressureReadings[i] = pressure/100;
     }
@@ -114,10 +103,23 @@ void loop() {
     }
   }
   Apogee:
-  if(apogee = 1){
-return;
-
-  }
+  Serial.print("T+");Serial.print(time/60000000);Serial.print(":");Serial.print(TenSec);Serial.print(OneSec);Serial.print(":");Serial.print(TenthSec);Serial.print(HundrethSec);Serial.print(MilliSec);Serial.print(HundredMicro);Serial.print(TenMicro);Serial.print(Micro);
+  pressure = myPressure.readPressure();
+  Serial.print(" Pressure(Pa):");
+  Serial.print(pressure, 2);
+   // open the file. note that only one file can be open at a time,
+  // so you have to close this one before opening another.  
+  // float temperature = myPressure.readTemp();
+  // Serial.print(" Temp(c):");
+  // Serial.print(temperature, 2);
+  temperature = myPressure.readTempF();
+  Serial.print(" Temp(f):");
+  Serial.print(temperature, 2);
+  Kelvin = (temperature - 32) * 5/9 + 273.15;
+  Altitude_AGL = (Kelvin/L_b)*((pow((P/pressure),(-R*L_b)/(g_0*M)))-1)- h_0;
+  Serial.print(" Altitude(m):");
+  Serial.print(Altitude_AGL, 2);
+  Serial.println();
   }
   
 }
