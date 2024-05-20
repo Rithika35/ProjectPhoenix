@@ -60,3 +60,43 @@ float t_0 = 288;
 
 const int SOLENOID1 = 7;  //first set
 const int SOLENOID2 = 5;  //second set
+
+void setup() {
+
+  // Apogee
+  Wire.begin();        // Join i2c bus
+  myPressure.begin(); // Get sensor online
+  Serial.begin(115200);
+  Serial.println("");
+  Serial.println("Timer:");
+  myPressure.setModeAltimeter(); // Measure altitude above sea level in meters
+  myPressure.setModeBarometer(); // Measure pressure in Pascals from 20 to 110 kPa
+  myPressure.setOversampleRate(1); // Set Oversample to the recommended 128
+  myPressure.enableEventFlags(); // Enable all three pressure and temp event flags
+
+  // BPS
+  // Initializing Serial Connection
+  Serial.begin(9600);
+  while(!Serial);
+  Serial.println("Adafruit_MPL3115A2 test!");
+  if (!baro.begin()) {
+    Serial.println("Could not find sensor. Check wiring.");
+    while(1);
+  }
+
+  // Initializing SD Card
+  Serial.println("Initializing SD card...");
+  pinMode(10, OUTPUT);// change this pin to 53 for mega
+  if (!SD.begin(10)) {
+    Serial.println("initialization failed!");
+    return;
+  }
+  Serial.println("initialization done.");
+
+  // Locatizing Sensor to Launch Site
+  // use to set sea level pressure for current location
+  // this is needed for accurate altitude measurement
+  // STD SLP = 1013.26 hPa
+  //orlando is 1020 hpa
+  baro.setSeaPressure(1013.95);
+}
