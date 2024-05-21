@@ -1,50 +1,48 @@
-// QUESTION: Is it Faster to have different print statements or have one big print statement
-
 #include <SD.h>
 #include <Wire.h>
 #include "SparkFunMPL3115A2.h"
 #include <math.h>
 
-// Timing Variables
-#define NUM_READINGS 10
-unsigned long lastReadingTime ;
-const unsigned long readingInterval = 10000; // milliseconds
+// timing variables
+#define num_readings 10
+unsigned long lastreadingtime ;
+const unsigned long readinginterval = 10000; // milliseconds
 
-// Objects + Inputs and Output
-MPL3115A2 myPressure;
-File myFile;
-int ledPin = 13;  // LED is attached to digital pin 13
-const int led_pin = PB5;
+// objects + inputs and output
+mpl3115a2 mypressure;
+file myfile;
+int ledpin = 13;  // led is attached to digital pin 13
+const int led_pin = pb5;
 volatile uint32_t count = 0;
 
-// Pressure Variables
-float Kelvin = 0 ;
-float Altitude_AGL;
-float pressureReadings[NUM_READINGS];
+// pressure variables
+float kelvin = 0 ;
+float altitude_agl;
+float pressurereadings[num_readings];
 
-// Apogee Flag
+// apogee flag
 int apogee = 0;
 
-// Lockout Timing
-float SuperSonicMin = 0.0;
-float SuperSonicSec = 10.0;
+// lockout timing
+float supersonicmin = 0.0;
+float supersonicsec = 10.0;
 
-//Timer
+//timer
 unsigned long time;
 
-// Altitude Calculation Constants and Variables
-float  L_b = -0.0065; //Standard temperature lapse rate (K/m)
-float  R = 8.31432; //Universal gas constant (N*m/mol*K)
-float  g_0 = 9.80665; //Acceleration due to gravity (m/s^2)
-float  M = 0.0289644; //Molar mass of Earth s air (kg/mol)
-float  h_0 = 28; //Launch site elevation above sea level (2000ft / 609.6m for FAR launch site)/ orlanod is 25 m(82ft)
-float ApogeeCount;
+// altitude calculation constants and variables
+float  l_b = -0.0065; //standard temperature lapse rate (k/m)
+float  r = 8.31432; //universal gas constant (n*m/mol*k)
+float  g_0 = 9.80665; //acceleration due to gravity (m/s^2)
+float  m = 0.0289644; //molar mass of earth s air (kg/mol)
+float  h_0 = 28; //launch site elevation above sea level (2000ft / 609.6m for far launch site)/ orlanod is 25 m(82ft)
+float apogeecount;
 float pressure = 0;
 float temperature = 0;
-float P_0 = 101325;//ground pressure
-float T_0 = 288;
+float p_0 = 101325;//ground pressure
+float t_0 = 288;
 
-void setup() { 
+void setup() {
   Wire.begin();        // Join i2c bus
   myPressure.begin(); // Get sensor online
   Serial.begin(115200);
