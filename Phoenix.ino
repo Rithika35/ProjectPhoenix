@@ -32,7 +32,7 @@ float threshold = 7.0; // Altitude in meters needed to detect lift off
 int liftoff = 0;// liftoff = flase
 unsigned long LiftOffTime = 0;
 
-// Lockoutperiod 
+// Lockoutperiod
 int lockout = 1; //lockout = true
 float SuperSonicMin = 0.0; //numer of minutes of lockout duration
 float SuperSonicSec = 7.0; // number of seconds of lockout duration
@@ -54,7 +54,7 @@ int TurnOffValve = 0;
 const int IGNITER = 8;//set initiator to pin 8
 bool igniterOn = false;
 
-//Actuator 
+//Actuator
 int DroneDeploy = 0;//if solenoid valve is closed drone is ready to deploy
 float DroneDeployment = 15;//altitude of drone deployment in meters
 const int Actuator = 9;
@@ -62,12 +62,12 @@ int TouchDown =0;
 
 //function to check if lockout is over
 bool isLockoutOver(float altitude){
-  static int consecutiveCount = 0; 
+  static int consecutiveCount = 0;
   bool status;
   // Check if altitude is greater than the last reading
   if (altitude > lastAltitude) {
     // Increase consecutive readings count
-    consecutiveCount++;  
+    consecutiveCount++;
     // Check if consecutive readings count reaches the threshold
     if (consecutiveCount >= consecutiveReadings) {
       return true; // Altitude is increasing for consecutive readings
@@ -77,21 +77,21 @@ bool isLockoutOver(float altitude){
     consecutiveCount = 0;
     status = false;
   }
-  
+
   // Update the last altitude reading
   lastAltitude = altitude;
-  
+
   return false; // Altitude is not increasing for consecutive readings
 }
 
 //function to check if apogee has been reach using pressure
 bool isApogee(float Pressure){
-  static int consecutiveCount = 0; 
+  static int consecutiveCount = 0;
   bool status;
   // Check if altitude is greater than the last reading
   if (Pressure > ApogeePressure) {
     // Increase consecutive readings count
-    consecutiveCount++;  
+    consecutiveCount++;
     // Check if consecutive readings count reaches the threshold
     if (consecutiveCount >= consecutiveReadings) {
       return true; // Altitude is increasing for consecutive readings
@@ -101,10 +101,10 @@ bool isApogee(float Pressure){
     consecutiveCount = 0;
     status = false;
   }
-  
+
   // Update the last altitude reading
   ApogeePressure = Pressure;
-  
+
   return false; // Altitude is not increasing for consecutive readings
 }
 
@@ -116,7 +116,7 @@ void setup() {
   myPressure.setModeAltimeter(); // Measure altitude above sea level in meters
   myPressure.setModeBarometer(); // Measure pressure in Pascals from 20 to 110 kPa
   myPressure.setOversampleRate(128); // Set Oversample to the recommended 128
-  myPressure.enableEventFlags(); // Enable all three pressure and temp event flags 
+  myPressure.enableEventFlags(); // Enable all three pressure and temp event flags
   pinMode(SOLENOID1, OUTPUT);//set solenoid 1 pin
   pinMode(SOLENOID2, OUTPUT);//set solenoid 2 pin
   pinMode(IGNITER, OUTPUT);//set initiator pin
@@ -137,8 +137,8 @@ void loop() {
 
   // Read sensor every 10 milliseconds
   if (time - lastReadingTime >= readingInterval) {
-    lastReadingTime = time; 
-  
+    lastReadingTime = time;
+
     //while on launchpad after pin has been pulled
     if(liftoff == 0){
       Serial.print("T-");Serial.print(time/60000000);Serial.print(":");Serial.print(TenSec);Serial.print(OneSec);Serial.print(":");Serial.print(TenthSec);Serial.print(HundrethSec);Serial.print(MilliSec);Serial.print(HundredMicro);Serial.print(TenMicro);Serial.print(Micro);
@@ -148,7 +148,7 @@ void loop() {
       temperature = myPressure.readTempF();
       Serial.print(" Temp(f):");
       Serial.print(temperature, 2);
-      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude 
+      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude
       Serial.print(" Altitude(m):");
       Serial.println(Altitude_AGL, 2);
     }
@@ -169,13 +169,13 @@ void loop() {
       temperature = myPressure.readTempF();
       Serial.print(" Temp(f):");
       Serial.print(temperature, 2);
-      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude 
+      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude
       Serial.print(" Altitude(m):");
       Serial.print(Altitude_AGL, 2);
       Serial.println(" LOCKOUT PERIOD");
-      
-      if(time > SuperSonicCount){//if simulated lockout period is over  
-        
+
+      if(time > SuperSonicCount){//if simulated lockout period is over
+
         if (isLockoutOver(Altitude_AGL)) {//begin to check for 10 consectutive increasing values
           Serial.println("Lockout Period Over");
           lockout = 0;
@@ -183,7 +183,7 @@ void loop() {
         }
       }
     }
-    
+
     //if lockout period is over startlooking for apogee
     if(liftoff == 1 && lockout == 0 && Apogee ==0 ){
       Serial.print("T+");Serial.print(time/60000000);Serial.print(":");Serial.print(TenSec);Serial.print(OneSec);Serial.print(":");Serial.print(TenthSec);Serial.print(HundrethSec);Serial.print(MilliSec);Serial.print(HundredMicro);Serial.print(TenMicro);Serial.print(Micro);
@@ -193,28 +193,28 @@ void loop() {
       temperature = myPressure.readTempF();
       Serial.print(" Temp(f):");
       Serial.print(temperature, 2);
-      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude 
+      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude
       Serial.print(" Altitude(m):");
       Serial.println(Altitude_AGL, 2);
-      
+
       if(isApogee(pressure)){
-          
+
         Apogee = 1;
         PORTB ^= (1 << led_pin);
         Serial.println("Apogee Detected");
         digitalWrite(SOLENOID1, HIGH);
         digitalWrite(SOLENOID2, HIGH);
-        ApogeeTime = time;  
-          
+        ApogeeTime = time;
+
         if (!igniterOn) {
           // Turn on igniter
           digitalWrite(IGNITER, HIGH);
           igniterOn = true;
-        }  
+        }
       }
     }
-  
-   
+
+
     //After apogee wait 45 seconds to turn of solenoid, and open actuator at 400 ft/121.92 meters
     if(Apogee == 1 && liftoff==1 && lockout ==0){
       Serial.print("T+");Serial.print(time/60000000);Serial.print(":");Serial.print(TenSec);Serial.print(OneSec);Serial.print(":");Serial.print(TenthSec);Serial.print(HundrethSec);Serial.print(MilliSec);Serial.print(HundredMicro);Serial.print(TenMicro);Serial.print(Micro);
@@ -224,7 +224,7 @@ void loop() {
       temperature = myPressure.readTempF();
       Serial.print(" Temp(f):");
       Serial.print(temperature, 2);
-      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude 
+      Altitude_AGL =(((T_0)/(L_b))*(pow((pressure/P_0),((-R*L_b)/(g_0*M)))-1)) - h_0; //Formula to detect altitude
       Serial.print(" Altitude(m):");
       Serial.println(Altitude_AGL, 2);
       digitalWrite(IGNITER, LOW);//turn off ignitor pin
